@@ -18,7 +18,7 @@
       "port": 9099
     },
     "functions": {
-      "port": 5001
+      "port": 5002
     },
     "firestore": {
       "port": 8080
@@ -30,7 +30,8 @@
       "port": 8085
     },
     "ui": {
-      "enabled": true
+      "enabled": true,
+      "port": 4000
     }
   },
   "remoteconfig": {

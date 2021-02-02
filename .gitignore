@@ -74,3 +74,5 @@ node_modules/
 
 # Node.js dependency directory
 */node_modules/
+
+functions/devServiceAccountKey.json
