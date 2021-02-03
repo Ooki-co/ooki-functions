@@ -1,8 +1,10 @@
 import {firestore} from 'firebase-admin';
+import {logger} from 'firebase-functions';
 import {IArtist} from './types';
 import Spotify, {getAccessToken} from '../../utils/spotify';
 import db from '../../utils/db';
 import sleep from '../../utils/sleepProcess';
+import {Request, Response} from 'express';
 
 const {FieldValue} = firestore;
 
@@ -20,14 +22,12 @@ interface IArtistPublic {
 
 /**
  *
+ * @param {Request} req
+ * @param {Response} res
  */
-class Artist {
-  /**
-   * add a new artist
-   * @param {Object} data artist data object
-   * @return {Object}
-   */
-  static async add(data: IArtist): Promise<any> {
+async function add(req:Request, res:Response): Promise<any> {
+  try {
+    const data:IArtist = req.body;
     const {
       spotifyId,
       email = '',
@@ -36,11 +36,13 @@ class Artist {
       addedBy = 'manual',
     } = data;
     sleep(500);
+
     const artistRef = db.collection('artists').doc(spotifyId);
     await getAccessToken();
+
     const {body: artist} = await Spotify.getArtist(spotifyId);
 
-    if (!artist) return false;
+    if (!artist) return res.status(200).json({status: false});
 
     await artistRef.set({
       spotifyId,
@@ -53,15 +55,29 @@ class Artist {
       images: artist.images,
       createdAt: FieldValue.serverTimestamp(),
     });
-    return true;
-  }
 
-  /**
-   * get list of Artists by query
-   * @param {String} query
-   * @return {String} list of artists
-   */
-  static async getAll(query: IQueryArtist): Promise<any> {
+    return res.status(200).json({status: true});
+  } catch (err) {
+    logger.error(err);
+    res.status(500).send('Something broke!');
+  }
+}
+
+/**
+ *
+ * @param {Request} req
+ * @param {Response} res
+ */
+async function getAll(req:Request, res:Response): Promise<any> {
+  try {
+    const query: IQueryArtist = {
+      limit: req.query.limit && Number(req.query.limit) ?
+        Number(req.query.limit) :
+        undefined,
+      offset: req.query.offset && Number(req.query.offset) ?
+        Number(req.query.offset) :
+        undefined,
+    };
     const {limit = 8, offset = 1} = query;
 
     const first = db.collection('artists')
@@ -78,26 +94,77 @@ class Artist {
 
     const artistList: FirebaseFirestore.DocumentData[] = [];
     artists.forEach((artist) => {
-      artistList.push(this.artistMapper(artist.data()));
+      artistList.push(artistMapper(artist.data()));
     });
 
-    return artistList;
-  }
-
-  /**
-   *
-   * @param {object} artist
-   * @return {IArtistPublic}
-   */
-  private static artistMapper(artist: any): IArtistPublic {
-    return {
-      imageUrl: artist.images.find((img:any) => img.height === 320).url,
-      artistName: artist.artistName,
-      spotifyId: artist.spotifyId,
-      instagramUsername: artist.instagramUsername,
-      genres: artist.genres,
-    };
+    return res.status(200).json(artistList);
+  } catch (err) {
+    logger.error(err);
+    res.status(500).send('Something broke!');
   }
 }
 
-export default Artist;
+/**
+ * get random track from first 20 new releases
+ * @param {Request} req
+ * @param {Response} res
+ */
+async function getRandomTrack(req:Request, res:Response): Promise<any> {
+  try {
+    const limit = randomInt(20);
+
+    const albums = await db.collection('albums')
+        .orderBy('releasedAt', 'desc')
+        .limit(limit)
+        .get();
+
+    const album = albums.docs[albums.docs.length - 1];
+
+    const tracks = await db.collection('albums')
+        .doc(album.id).collection('tracks')
+        .get();
+
+    const trackIndex = randomInt(tracks.docs.length - 2);
+
+    const track = tracks.docs[trackIndex];
+
+    res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+    return res.status(200).json({
+      imageUrl: album.data().image[0].url,
+      trackId: track.id,
+    });
+  } catch (err) {
+    logger.error(err);
+    res.status(500).send('Something broke!');
+  }
+}
+
+/**
+ *
+ * @param {object} artist
+ * @return {IArtistPublic}
+ */
+function artistMapper(artist: any): IArtistPublic {
+  return {
+    imageUrl: artist.images.find((img:any) => img.height === 320).url,
+    artistName: artist.artistName,
+    spotifyId: artist.spotifyId,
+    instagramUsername: artist.instagramUsername,
+    genres: artist.genres,
+  };
+}
+
+/**
+ *
+ * @param {Number} max
+ * @return {Number}
+ */
+function randomInt(max: number): number {
+  const min = 1;
+  if (max < min) {
+    return 0;
+  }
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export default {add, getAll, getRandomTrack};
