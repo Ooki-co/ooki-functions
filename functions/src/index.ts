@@ -5,7 +5,12 @@ import * as cors from 'cors';
 import * as bodyParser from 'body-parser';
 import * as helmet from 'helmet';
 import {resolve} from 'path';
-dotenv.config({path: resolve(__dirname, '../.env')});
+
+const envFilename = process.env.APP_ENV == 'prod' ?
+  'prod.env' :
+  'dev.env';
+dotenv.config({path: resolve(__dirname, `../${envFilename}`)});
+
 
 import getAlbumsOfArtistTrigger from './triggers/getAlbumsOfArtist';
 import getTracksOfAlbumTrigger from './triggers/getTracksOfAlbum';

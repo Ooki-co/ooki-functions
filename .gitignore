@@ -63,7 +63,7 @@ node_modules/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+*.env
 
 # Compiled JavaScript files
 */lib/**/*.js
@@ -75,4 +75,4 @@ node_modules/
 # Node.js dependency directory
 */node_modules/
 
-functions/devServiceAccountKey.json
+functions/*.serviceAccountKey.json

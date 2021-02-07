@@ -4,12 +4,12 @@
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
     "build:watch": "tsc -w",
-    "emulator": "firebase emulators:start --only functions --inspect-functions",
+    "emulator": "APP_ENV=dev firebase emulators:start --only functions --inspect-functions",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
-    "deploy:dev": "firebase deploy --only functions --project ooki-dev",
-    "deploy:prod": "firebase deploy --only functions --project ooki-prod",
+    "deploy:dev": "APP_ENV=dev firebase deploy --only functions --project ooki-dev",
+    "deploy:prod": "APP_ENV=prod firebase deploy --only functions --project ooki-prod",
     "logs": "firebase functions:log"
   },
   "engines": {
