@@ -1,3 +1,9 @@
-import Artist from './artist';
+import {add} from './add';
+import {getAll} from './getAll';
+import {getRandomTrack} from './getRandomTrack';
 
-export default Artist;
+export default {
+  add,
+  getAll,
+  getRandomTrack,
+};

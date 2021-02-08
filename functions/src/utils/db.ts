@@ -2,7 +2,7 @@ import * as admin from 'firebase-admin';
 import {readFileSync} from 'fs';
 import {resolve} from 'path';
 
-const keyPath = process.env.APP_ENV == 'prod' ?
+const keyPath = process.env.GCLOUD_PROJECT == 'ooki-prod' ?
   'prod.serviceAccountKey.json' :
   'dev.serviceAccountKey.json';
 

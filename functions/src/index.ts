@@ -6,11 +6,10 @@ import * as bodyParser from 'body-parser';
 import * as helmet from 'helmet';
 import {resolve} from 'path';
 
-const envFilename = process.env.APP_ENV == 'prod' ?
+const envFilename = process.env.GCLOUD_PROJECT == 'ooki-prod' ?
   'prod.env' :
   'dev.env';
 dotenv.config({path: resolve(__dirname, `../${envFilename}`)});
-
 
 import getAlbumsOfArtistTrigger from './triggers/getAlbumsOfArtist';
 import getTracksOfAlbumTrigger from './triggers/getTracksOfAlbum';
@@ -29,11 +28,16 @@ app.get('/artists', Artist.getAll);
 
 app.post('/artists', Artist.add);
 
-app.post('/feedback', addFeedback);
-
 app.get('/track', Artist.getRandomTrack);
 
-export const api = functions.region('europe-west2').https.onRequest(app);
+app.post('/feedback', addFeedback);
+
+export const api = functions
+    .runWith({
+      memory: '256MB',
+      timeoutSeconds: 60,
+    })
+    .region('europe-west2').https.onRequest(app);
 
 export const getAlbumsOfArtist = getAlbumsOfArtistTrigger;
 export const getTracksOfAlbum = getTracksOfAlbumTrigger;

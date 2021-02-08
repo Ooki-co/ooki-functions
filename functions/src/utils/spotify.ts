@@ -41,7 +41,9 @@ class Spotify {
    */
   static getArtist(id: string): Promise<RecordObj> {
     return spotifyApi.getArtist(id).catch((err:any) => {
-      functions.logger.error('SpotifyAPIError: ', JSON.stringify(err));
+      functions.logger.error(
+          'SpotifyAPIError[getArtist]: ', JSON.stringify(err)
+      );
     });
   }
 
@@ -57,7 +59,9 @@ class Spotify {
       market: 'US',
       ...query,
     }).catch((err:any) => {
-      functions.logger.error('SpotifyAPIError: ', JSON.stringify(err));
+      functions.logger.error(
+          'SpotifyAPIError[getArtistAlbums]: ', JSON.stringify(err)
+      );
     });
   }
 
@@ -70,7 +74,9 @@ class Spotify {
     return spotifyApi.getAlbumTracks(albumId, {
       limit: 50,
     }).catch((err:any) => {
-      functions.logger.error('SpotifyAPIError: ', JSON.stringify(err));
+      functions.logger.error(
+          'SpotifyAPIError[getAlbumTracks]: ', JSON.stringify(err)
+      );
     });
   }
 
@@ -81,7 +87,9 @@ class Spotify {
    */
   static getAudioFeatures(trackId: string): Promise<RecordObj> {
     return spotifyApi.getAudioFeaturesForTrack(trackId).catch((err:any) => {
-      functions.logger.error('SpotifyAPIError: ', JSON.stringify(err));
+      functions.logger.error(
+          'SpotifyAPIError[getAudioFeatures]: ', JSON.stringify(err)
+      );
     });
   }
 }

@@ -2,40 +2,55 @@ import * as functions from 'firebase-functions';
 import db from '../utils/db';
 import Spotify, {getAccessToken} from '../utils/spotify';
 import sleep from '../utils/sleepProcess';
+import {IAudioFeatures} from '../types/track';
 
 const getAudioFeatureOfTrack = functions.region('europe-west2')
-    .firestore.document('albums/{spotifyAlbumId}/tracks/{spotifyTrackId}')
+    .firestore.document('tracks/{spotifyTrackId}')
     .onCreate(async (snap, context) => {
-      const {spotifyAlbumId, spotifyTrackId} = context.params;
-      functions.logger.info(`AlbumID: ${spotifyAlbumId}`);
+      const {spotifyTrackId} = context.params;
+
       functions.logger.info(`TrackID: ${spotifyTrackId}`);
 
-      sleep(1000);
+      let result = null;
+      let tries = 0;
+      do {
+        if (tries > 0) {
+          sleep(5000);
+        }
+        await getAccessToken();
+        tries++;
+        result = await Spotify.getAudioFeatures(spotifyTrackId);
+      } while (!result || !result.body);
 
-      await getAccessToken();
-      const result = await Spotify.getAudioFeatures(spotifyTrackId);
-      const trackAudioFeatures = result.body;
-      functions.logger.info(`TrackAudioFeatures: ${trackAudioFeatures}`);
+      functions.logger.info('Tries[getAudioFeaturesOfTrack]: ', tries);
 
-      const trackRef = db
-          .collection('albums').doc(spotifyAlbumId)
-          .collection('tracks').doc(spotifyTrackId);
+      try {
+        const trackAudioFeatures = result.body;
+        functions.logger.info('TrackAudioFeatures: fetched');
 
-      return trackRef.set({
-        danceability: trackAudioFeatures.danceability,
-        energy: trackAudioFeatures.energy,
-        key: trackAudioFeatures.key,
-        loudness: trackAudioFeatures.loudness,
-        mode: trackAudioFeatures.mode,
-        speechiness: trackAudioFeatures.speechiness,
-        acousticness: trackAudioFeatures.acousticness,
-        instrumentalness: trackAudioFeatures.instrumentalness,
-        liveness: trackAudioFeatures.liveness,
-        valence: trackAudioFeatures.valence,
-        tempo: trackAudioFeatures.tempo,
-        duration_ms: trackAudioFeatures.duration_ms,
-        time_signature: trackAudioFeatures.time_signature,
-      }, {merge: true});
+        const trackRef = db
+            .collection('tracks').doc(spotifyTrackId);
+
+        return trackRef.set({
+          audioFeatures: {
+            danceability: trackAudioFeatures.danceability,
+            energy: trackAudioFeatures.energy,
+            key: trackAudioFeatures.key,
+            loudness: trackAudioFeatures.loudness,
+            mode: trackAudioFeatures.mode,
+            speechiness: trackAudioFeatures.speechiness,
+            acousticness: trackAudioFeatures.acousticness,
+            instrumentalness: trackAudioFeatures.instrumentalness,
+            liveness: trackAudioFeatures.liveness,
+            valence: trackAudioFeatures.valence,
+            tempo: trackAudioFeatures.tempo,
+            timeSignature: trackAudioFeatures.time_signature,
+          } as IAudioFeatures,
+        }, {merge: true});
+      } catch (err) {
+        functions.logger.error(err);
+        return Promise.reject(err);
+      }
     });
 
 
