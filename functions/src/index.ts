@@ -30,6 +30,8 @@ app.post('/artists', Artist.add);
 
 app.get('/track', Artist.getRandomTrack);
 
+app.get('/sanlar', Artist.getNumbers);
+
 app.post('/feedback', addFeedback);
 
 export const api = functions
