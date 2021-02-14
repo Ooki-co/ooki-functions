@@ -22,6 +22,10 @@ async function add(req:Request, res:Response): Promise<any> {
       message,
     } = data;
 
+    if (!email) {
+      return res.sendStatus(200);
+    }
+
     const feedbackRef = db.collection('feedback').doc();
     await feedbackRef.set({
       email,
@@ -29,7 +33,7 @@ async function add(req:Request, res:Response): Promise<any> {
       createdAt: FieldValue.serverTimestamp(),
     });
 
-    return true;
+    res.sendStatus(200);
   } catch (err) {
     logger.error(err);
     res.status(500).send('Something broke!');
