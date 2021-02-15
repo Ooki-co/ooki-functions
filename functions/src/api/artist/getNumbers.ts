@@ -18,7 +18,7 @@ export async function getNumbers(req:Request, res:Response): Promise<any> {
     });
 
     const now = new Date();
-    const firstDay = now.getDate() - now.getDay();
+    const firstDay = now.getDate() - (now.getDay() == 0 ? 7 : now.getDay());
     const thisWeekBeginning = new Date(
         `${now.getFullYear()}-${now.getMonth() + 1}-${firstDay + 1}`
     );
