@@ -3,7 +3,7 @@ import {logger} from 'firebase-functions';
 import {Request, Response} from 'express';
 import Spotify, {getAccessToken} from '../../utils/spotify';
 import sleep from '../../utils/sleepProcess';
-import db from '../../utils/db';
+import {db} from '../../utils/firebase';
 
 const {FieldValue} = firestore;
 

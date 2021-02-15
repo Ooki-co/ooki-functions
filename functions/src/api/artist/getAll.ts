@@ -1,5 +1,5 @@
 import {logger} from 'firebase-functions';
-import db from '../../utils/db';
+import {db} from '../../utils/firebase';
 import {Request, Response} from 'express';
 
 interface IQuery {

@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import {firestore} from 'firebase-admin';
-import db from '../utils/db';
+import {db} from '../utils/firebase';
 import Spotify, {getAccessToken} from '../utils/spotify';
 import sleep from '../utils/sleepProcess';
 import {IAlbum} from '../types/album';

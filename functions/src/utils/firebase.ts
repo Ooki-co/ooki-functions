@@ -1,4 +1,4 @@
-import * as admin from 'firebase-admin';
+import * as fireAdmin from 'firebase-admin';
 import {readFileSync} from 'fs';
 import {resolve} from 'path';
 
@@ -10,11 +10,13 @@ const serviceAccount = readFileSync(resolve(__dirname, `../../${keyPath}`))
     .toString();
 
 const adminConfig = JSON.parse(process.env.FIREBASE_CONFIG || '');
-adminConfig.credential = admin.credential.cert(JSON.parse(serviceAccount));
+adminConfig.credential = fireAdmin.credential.cert(JSON.parse(serviceAccount));
 
-admin.initializeApp(adminConfig);
+fireAdmin.initializeApp(adminConfig);
 
-const db = admin.firestore();
-db.settings({ignoreUndefinedProperties: true});
+const firestore = fireAdmin.firestore();
+firestore.settings({ignoreUndefinedProperties: true});
 
-export default db;
+
+export const db = firestore;
+export const admin = fireAdmin;
