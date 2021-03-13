@@ -6,14 +6,34 @@ import sleep from '../utils/sleepProcess';
 import {IAlbum} from '../types/album';
 import {getArtistsMap} from '../utils/mapper';
 const {FieldValue} = firestore;
-
+import mongodb from '../models';
+const Album = mongodb.model('Album');
 
 const getAlbumsOfArtist = functions.region('europe-west2')
     .firestore.document('artists/{spotifyArtistId}')
-    .onCreate(async (snap, context) => {
+    .onUpdate(async (change, context) => {
       const {spotifyArtistId} = context.params;
 
-      functions.logger.info(`ArtistID: ${spotifyArtistId}`);
+      const {before, after} = change as any;
+      const artistBefore = before.data();
+      const artistAfter = after.data();
+
+      if (artistBefore.approved) {
+        functions.logger.info(
+            `Albums already fetched - ArtistID: ${spotifyArtistId}`
+        );
+        return Promise.resolve();
+      }
+
+      if (!artistAfter.approved) {
+        functions.logger.info(
+            `[Approved:False] Not fetching albums,  
+            ArtistID: ${spotifyArtistId}`
+        );
+        return Promise.resolve();
+      }
+
+      functions.logger.info(`Fetching Albums - ArtistID: ${spotifyArtistId}`);
 
       let result = null;
       let tries = 0;
@@ -62,7 +82,18 @@ const getAlbumsOfArtist = functions.region('europe-west2')
           batch.set(albumRef, album);
         });
 
-        return batch.commit();
+        const albumsForMongodb = albums.map((album) => {
+          return {
+            ...album,
+            createdAt: undefined, // mongoose will set default value
+            modifiedAt: undefined,
+          };
+        });
+
+        return Promise.all([
+          batch.commit(),
+          Album.create(albumsForMongodb),
+        ]);
       } catch (err) {
         functions.logger.error(err);
         return Promise.reject(err);

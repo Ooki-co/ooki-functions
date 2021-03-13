@@ -1,3 +1,4 @@
+import {IImageMap} from './common';
 export interface IArtist {
   name: string,
   addedBy: 'manual' | 'web',
@@ -7,16 +8,10 @@ export interface IArtist {
   instagramUsername?: string,
   spotifyArtistId: string,
   youtubeChannelId?: string,
+  approved?: boolean,
   createdAt: number, // timestamp
   modifiedAt: number, // timestamp
 }
-
-export interface IImageMap {
-  height: number,
-  width: number,
-  url: string
-}
-
 export interface IArtistMap {
   spotifyArtistId: string,
   name: string

@@ -4,6 +4,8 @@ import {Request, Response} from 'express';
 import Spotify, {getAccessToken} from '../../utils/spotify';
 import sleep from '../../utils/sleepProcess';
 import {db} from '../../utils/firebase';
+import mongodb from '../../models';
+const Artist = mongodb.model('Artist');
 
 const {FieldValue} = firestore;
 
@@ -64,10 +66,11 @@ export async function add(req:Request, res:Response): Promise<any> {
       });
     }
 
-    await artistRef.set({
+    const saveFirestore = artistRef.set({
       name: artist.name,
       addedBy,
       email,
+      approved: addedBy === 'manual',
       genres: artist.genres,
       images: artist.images,
       instagramUsername,
@@ -76,6 +79,26 @@ export async function add(req:Request, res:Response): Promise<any> {
       createdAt: FieldValue.serverTimestamp(),
       modifiedAt: FieldValue.serverTimestamp(),
     });
+
+    const saveMongodb = Artist.create({
+      spotifyArtistId: spotifyId,
+      name: artist.name,
+      addedBy,
+      email,
+      genres: artist.genres,
+      images: artist.images,
+      instagramUsername,
+      youtubeChannelId,
+      externalUrls: {
+        ...(artist.instagramUsername ? {instagram: `https://instagram.com/${artist.instagramUsername}`} : {}),
+        ...(artist.youtube ? {youtube: `https://youtube.com/channel/${artist.youtubeChannelId}`} : {}),
+      },
+    });
+
+    await Promise.all([
+      saveFirestore,
+      saveMongodb,
+    ]);
 
     return res.status(200).json({status: true});
   } catch (err) {
