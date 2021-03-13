@@ -1,14 +1,9 @@
 import * as functions from 'firebase-functions';
 import * as express from 'express';
-import * as dotenv from 'dotenv';
 import * as cors from 'cors';
 import * as helmet from 'helmet';
-import {resolve} from 'path';
-
-const envFilename = process.env.GCLOUD_PROJECT == 'ooki-prod' ?
-  'prod.env' :
-  'dev.env';
-dotenv.config({path: resolve(__dirname, `../${envFilename}`)});
+require('./config');
+require('./models');
 
 import getAlbumsOfArtistTrigger from './triggers/getAlbumsOfArtist';
 import getTracksOfAlbumTrigger from './triggers/getTracksOfAlbum';
