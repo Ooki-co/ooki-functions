@@ -40,12 +40,10 @@ const albumSchema = new Schema({
     _id: false,
     type: {
       type: String,
-      require: true,
       enum: ['C', 'P'],
     },
     text: {
       type: String,
-      require: true,
     },
   }],
   tracks: [{

@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import {logger} from 'firebase-functions';
 import albumSchema from './schemas/album';
 import artistSchema from './schemas/artist';
 import playlistSchema from './schemas/playlist';
@@ -20,13 +21,13 @@ const options = {
 const conn = mongoose.createConnection(config.MONGODB_URI, options);
 
 conn.on('error', (err) => {
-  console.error(`API DB connection is failed → ${err.message}`);
+  logger.error(`API DB connection is failed → ${err.message}`);
   // force to terminate
   process.exit(1);
 });
 
 conn.on('connected', () => {
-  console.log('App DB connection is successful');
+  logger.info('App DB connection is successful');
 });
 
 // create db collections

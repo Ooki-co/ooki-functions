@@ -7,6 +7,9 @@ import {IAlbum} from '../types/album';
 import {ITrack} from '../types/track';
 import {getArtistsMap, getTracksMap, getAlbumMap} from '../utils/mapper';
 const {FieldValue} = firestore;
+import mongodb from '../models';
+const Album = mongodb.model('Album');
+const Track = mongodb.model('Track');
 
 const getTracksOfAlbum = functions.region('europe-west2')
     .firestore.document('albums/{spotifyAlbumId}')
@@ -50,6 +53,14 @@ const getTracksOfAlbum = functions.region('europe-west2')
 
         functions.logger.info(`AlbumTracks: ${tracks.length}`);
 
+        const tracksForMongodb = tracks.map((track) => {
+          return {
+            ...track,
+            createdAt: undefined,
+            modifiedAt: undefined,
+          };
+        });
+
         const batch = db.batch();
 
         tracks.forEach((track:ITrack) => {
@@ -65,7 +76,15 @@ const getTracksOfAlbum = functions.region('europe-west2')
           tracks: getTracksMap(tracks),
         }, {merge: true});
 
-        return batch.commit();
+        return Promise.all([
+          batch.commit(),
+          Track.create(tracksForMongodb),
+          Album.findOneAndUpdate({
+            spotifyAlbumId,
+          }, {
+            tracks: getTracksMap(tracks),
+          }),
+        ]);
       } catch (err) {
         functions.logger.error(err);
         return Promise.reject(err);

@@ -8,6 +8,7 @@ export interface IArtist {
   instagramUsername?: string,
   spotifyArtistId: string,
   youtubeChannelId?: string,
+  approved?: boolean,
   createdAt: number, // timestamp
   modifiedAt: number, // timestamp
 }
