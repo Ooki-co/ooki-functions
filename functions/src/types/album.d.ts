@@ -1,6 +1,7 @@
 import {firestore} from 'firebase-admin';
-import {IArtistMap, IImageMap} from './artist';
+import {IArtistMap} from './artist';
 import {ITrackMap} from './track';
+import {IImageMap} from './common';
 
 export interface IAlbum {
   artists: IArtistMap[],
