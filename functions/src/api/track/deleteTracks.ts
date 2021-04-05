@@ -21,7 +21,6 @@ export async function deleteTracks(req:Request, res:Response): Promise<any> {
       }));
 
       if (artists.every((artist) => !artist)) {
-        console.log(artists);
         killList.push({
           spotifyTrackId: track.spotifyTrackId,
           name: track.name,

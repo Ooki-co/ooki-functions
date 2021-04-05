@@ -46,8 +46,6 @@ export async function add(req:IRequestExtended, res:Response): Promise<any> {
     const {body: createdPlaylist} =
       await spotifyUser.getPlaylist(spotifyPlaylistId);
 
-    console.log(createdPlaylist);
-
     const playlist = {
       spotifyPlaylistId: createdPlaylist.id,
       name: createdPlaylist.name,
@@ -73,7 +71,9 @@ export async function add(req:IRequestExtended, res:Response): Promise<any> {
 
     await Playlist.create(playlist);
 
-    return res.sendStatus(201);
+    return res.status(201).json({
+      link: createdPlaylist.external_urls.spotify,
+    });
   } catch (err) {
     logger.error(err);
     const message = err.message || 'Something went wrong!';
