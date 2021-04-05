@@ -32,14 +32,8 @@ const artistSchema = new Schema({
     type: Map,
     of: String,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
+}, {
+  timestamps: true,
 });
 
 export default artistSchema;

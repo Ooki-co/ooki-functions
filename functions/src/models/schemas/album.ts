@@ -59,14 +59,8 @@ const albumSchema = new Schema({
     previewUrl: String,
     trackNumber: Number,
   }],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
+}, {
+  timestamps: true,
 });
 
 export default albumSchema;

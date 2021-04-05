@@ -16,6 +16,9 @@ const playlistSchema = new Schema({
     type: String,
     maxLength: 300,
   },
+  owner: {
+    spotifyUserId: String,
+  },
   public: {
     type: Boolean,
     default: false,
@@ -26,16 +29,9 @@ const playlistSchema = new Schema({
   },
   tracks: [{
     _id: false,
-    artists: [{
-      spotifyArtistId: String,
-      name: String,
-    }],
-    durationMs: Number,
-    explicit: Boolean,
     spotifyTrackId: String,
-    name: String,
-    previewUrl: String,
-    trackNumber: Number,
+    addedBy: String,
+    addedAt: Date,
   }],
   images: [{
     _id: false,
@@ -43,15 +39,12 @@ const playlistSchema = new Schema({
     height: Number,
     url: String,
   }],
+  followers: {
+    total: Number,
+  },
   synchronizedAt: Date,
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
+}, {
+  timestamps: true,
 });
 
 export default playlistSchema;

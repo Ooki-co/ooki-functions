@@ -37,14 +37,18 @@ const userSchema = new Schema({
   settings: {
     type: Map,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
+  auth: {
+    provider: {
+      type: String,
+      default: 'spotify',
+      enum: ['spotify'],
+    },
+    accessToken: String,
+    refreshToken: String,
+    expiresAt: Date,
   },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
+}, {
+  timestamps: true,
 });
 
 export default userSchema;
