@@ -2,35 +2,48 @@ import * as functions from 'firebase-functions';
 import * as express from 'express';
 import * as cors from 'cors';
 import * as helmet from 'helmet';
-require('./config');
+import setRoutes from './routes';
+import config from './config';
 require('./models');
 
 import getAlbumsOfArtistTrigger from './triggers/getAlbumsOfArtist';
 import getTracksOfAlbumTrigger from './triggers/getTracksOfAlbum';
 import getAudioFeatureOfTrackTrigger from './triggers/getAudioFeaturesOfTrack';
-import addFeedback from './api/feedback';
-import Artist from './api/artist';
 
 const app = express();
 
+const corsOptionsDelegate = (
+    req: express.Request,
+    callback: any
+): void => {
+  const corsOptions = {
+    origin: true,
+    optionsSuccessStatus: 200,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['Content-Length', 'Authorization'],
+  };
+
+  if (config.CORS_ORIGINS.includes(req.headers.origin as string)) {
+    corsOptions.origin = true;
+  }
+
+  callback(null, corsOptions);
+};
+
+
 app.use(helmet());
-app.use(cors());
+app.use(cors(corsOptionsDelegate));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
-app.get('/artists', Artist.getAll);
+setRoutes(app);
 
-app.post('/artists', Artist.add);
-
-app.get('/track', Artist.getRandomTrack);
-
-app.get('/sanlar', Artist.getNumbers);
-
-app.post('/feedback', addFeedback);
-
+const memory = config.APP_ENV === 'prod' ? '512MB' : '256MB';
 export const api = functions
     .runWith({
-      memory: '256MB',
+      memory,
       timeoutSeconds: 60,
     })
     .region('europe-west2')

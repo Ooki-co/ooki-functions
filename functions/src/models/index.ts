@@ -27,7 +27,7 @@ conn.on('error', (err) => {
 });
 
 conn.on('connected', () => {
-  logger.info('App DB connection is successful');
+  logger.info(`[${config.APP_ENV}] App DB connection is successful`);
 });
 
 // create db collections

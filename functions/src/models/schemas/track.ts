@@ -57,14 +57,8 @@ const trackSchema = new Schema({
     tempo: Number,
     timeSignature: Number,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
+}, {
+  timestamps: true,
 });
 
 export default trackSchema;
