@@ -24,6 +24,8 @@ const setRoutes = (app:any) => {
   );
 
   app.post('/playlists', auth, Playlist.add);
+
+  app.delete('/tracks', auth, Track.deleteTracks);
 };
 
 export default setRoutes;
