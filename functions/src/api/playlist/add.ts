@@ -46,8 +46,6 @@ export async function add(req:IRequestExtended, res:Response): Promise<any> {
     const {body: createdPlaylist} =
       await spotifyUser.getPlaylist(spotifyPlaylistId);
 
-    console.log(createdPlaylist);
-
     const playlist = {
       spotifyPlaylistId: createdPlaylist.id,
       name: createdPlaylist.name,
