@@ -6,7 +6,10 @@ import setRoutes from './routes';
 import config from './config';
 require('./models');
 
-import getAlbumsOfArtistTrigger from './triggers/getAlbumsOfArtist';
+import {
+  getAlbumsOfArtistOnCreate,
+  getAlbumsOfArtistOnUpdate,
+} from './triggers/getAlbumsOfArtist';
 import getTracksOfAlbumTrigger from './triggers/getTracksOfAlbum';
 import getAudioFeatureOfTrackTrigger from './triggers/getAudioFeaturesOfTrack';
 
@@ -49,6 +52,7 @@ export const api = functions
     .region('europe-west2')
     .https.onRequest(app);
 
-export const getAlbumsOfArtist = getAlbumsOfArtistTrigger;
+export const getAlbumsOfArtistManual = getAlbumsOfArtistOnCreate;
+export const getAlbumsOfArtistWeb = getAlbumsOfArtistOnUpdate;
 export const getTracksOfAlbum = getTracksOfAlbumTrigger;
 export const getAudioFeatureOfTrack = getAudioFeatureOfTrackTrigger;
