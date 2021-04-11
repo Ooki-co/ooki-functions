@@ -1,17 +1,18 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const SpotifyAPI = require('spotify-web-api-node');
 import * as functions from 'firebase-functions';
+import config from '../config';
 
 const spotifyApi = new SpotifyAPI({
-  clientId: process.env.SPOTIFY_CLIENT_ID,
-  clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+  clientId: config.SPOTIFY_CLIENT_ID,
+  clientSecret: config.SPOTIFY_CLIENT_SECRET,
 });
 
 export const getAccessToken = ():Promise<any> =>
   spotifyApi.clientCredentialsGrant().then(
       function(data:any) {
         functions.logger.info('SpotifyAPIAuth: The access token created');
-
+        functions.logger.info(`ClientID: ${config.SPOTIFY_CLIENT_ID}`);
         spotifyApi.setAccessToken(data.body.access_token);
       },
       function(err:any) {
