@@ -6,6 +6,7 @@ import sleep from '../../utils/sleepProcess';
 import {db} from '../../utils/firebase';
 import mongodb from '../../models';
 const Artist = mongodb.model('Artist');
+import config from '../../config';
 
 const {FieldValue} = firestore;
 
@@ -25,8 +26,8 @@ interface IArtist {
  */
 export async function add(req:Request, res:Response): Promise<any> {
   logger.info({
-    env: process.env.APP_ENV,
-    spotify: process.env.SPOTIFY_CLIENT_ID,
+    env: config.APP_ENV,
+    spotify: config.SPOTIFY_CLIENT_ID,
   });
   const data:IArtist = req.body;
   const {
