@@ -23,6 +23,7 @@ const setRoutes = (app:any) => {
       Track.getTracks
   );
 
+  app.get('/users/me/playlists', auth, Playlist.getUserPlaylists);
   app.post('/playlists', auth, Playlist.add);
 
   app.delete('/tracks', auth, Track.deleteTracks);
